@@ -7,9 +7,9 @@ K_30m = "30m"
 K_60m = "60m"
 
 K_TYPE = {
-    K_DAY: 1,
-    K_WEEK: 2,
-    K_MONTH: 3,
+    K_DAY: "daily",
+    K_WEEK: "weekly",
+    K_MONTH: "monthly",
     K_5m: 5,
     K_15m: 15,
     K_30m: 30,
