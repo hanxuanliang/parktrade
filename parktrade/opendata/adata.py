@@ -11,7 +11,12 @@ def stock_history_ad(
     level: str = market.K_DAY,
 ) -> pd.DataFrame:
     """Fetch stock history use adata."""
-    k_type = market.K_TYPE[level]
+    K_TYPE = {
+        market.K_DAY: 1,
+        market.K_WEEK: 2,
+        market.K_MONTH: 3,
+    }
+    k_type = K_TYPE[level]
 
     # TODO adata 目前不支持分钟级别数据获取
     return ad.stock.market.get_market(
