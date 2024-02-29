@@ -6,7 +6,8 @@ from tqdm import tqdm
 import time
 
 from parktrade.tools import market
-from parktrade.opendata.adata import stock_history_ad
+from parktrade.oda.adata import stock_history_ad
+from parktrade.oda.baostock import stock_history_bs
 
 MAX_CONNECTIONS = 32
 
@@ -29,7 +30,7 @@ def get_quote_history_multi(
     @multitasking.task
     @retry(tries=3, delay=1)
     def start(code: str):
-        _df = stock_history_ad(code, start_date, end_date, fqt, **kwargs)
+        _df = get_quote_history(code, start_date, end_date, fqt, **kwargs)
         dfs[code] = _df
         _df.to_csv(f"./parktrade/data/{code}-{fqt}.csv", index=False)
 
@@ -45,6 +46,19 @@ def get_quote_history_multi(
     pbar.close()
 
     return dfs
+
+
+def get_quote_history(
+    code: str,
+    start_date: str = "1970-01-01",
+    end_date: str = "2100-01-01",
+    fqt: str = market.K_DAY,
+    **kwargs,
+) -> pd.DataFrame:
+    if fqt in [market.K_DAY, market.K_WEEK, market.K_MONTH]:
+        return stock_history_ad(code, start_date, end_date, fqt, **kwargs)
+
+    return stock_history_bs(code, start_date, end_date, fqt, **kwargs)
 
 
 def into_code(code_csv: str) -> pd.DataFrame:
@@ -66,4 +80,6 @@ if __name__ == "__main__":
 
     codes = [codes[i : i + 50] for i in range(0, len(codes), 50)]
     for code_batch in codes:
-        get_quote_history_multi(code_batch, fqt=market.K_DAY)
+        get_quote_history_multi(
+            code_batch, start_date="2023-06-01", end_date="2024-02-29", fqt=market.K_30m
+        )
